@@ -1,0 +1,118 @@
+<section id="ep-event-product-section" class="ep-section" data-product-id="{{ product.id }}">
+  <div class="ep-grid">
+    <div class="ep-left">
+      <div class="ep-image">
+        {% if product.featured_image %}
+          <img
+            src="{{ product.featured_image | img_url: '1024x1024' }}"
+            alt="{{ product.featured_image.alt | escape }}"
+          >
+        {% elsif product.images.size > 0 %}
+          <img src="{{ product.images.first | img_url: '1024x1024' }}" alt="{{ product.title | escape }}">
+        {% else %}
+          <div style="background:#f4f4f4;height:320px;display:flex;align-items:center;justify-content:center;color:#999;">
+            No image
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="ep-right">
+      <h1 class="ep-title">{{ product.title }}</h1>
+      <div class="ep-description">{{ product.description | strip_html | truncate: 400 }}</div>
+
+      <div class="ep-price" id="ep-price">{{ product.price | money }}</div>
+
+      <div class="ep-selectors" id="ep-selectors">
+        {% for option in product.options_with_values %}
+          <div class="ep-select" data-option-index="{{ forloop.index0 }}">
+            <label for="ep-option-{{ forloop.index0 }}">{{ option.name }}</label>
+            <select
+              id="ep-option-{{ forloop.index0 }}"
+              class="ep-option-select"
+              data-option-name="{{ option.name | escape }}"
+            >
+              <option value="">— Оберіть {{ option.name }} —</option>
+              {% for value in option.values %}
+                <option value="{{ value | escape }}">{{ value }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="ep-cta">
+        <button id="ep-add-to-cart" class="ep-button" type="button">Перейти до чекауту</button>
+        <div id="ep-variant-status" style="font-size:13px;color:#555;">&nbsp;</div>
+      </div>
+
+      <form id="ep-personal-form" class="ep-form" novalidate>
+        <div class="ep-row">
+          <div style="flex:1" class="ep-input">
+            <label for="ep-first-name">Ім'я *</label>
+            <input id="ep-first-name" name="first_name" type="text" required>
+          </div>
+          <div style="flex:1" class="ep-input">
+            <label for="ep-last-name">Прізвище *</label>
+            <input id="ep-last-name" name="last_name" type="text" required>
+          </div>
+        </div>
+        <div class="ep-row">
+          <div style="flex:1" class="ep-input">
+            <label for="ep-email">Email *</label>
+            <input id="ep-email" name="email" type="email" required>
+          </div>
+          <div style="flex:1" class="ep-input">
+            <label for="ep-phone">Телефон *</label>
+            <input id="ep-phone" name="phone" type="tel" required>
+          </div>
+        </div>
+        <div class="ep-row">
+          <div style="flex:1" class="ep-input">
+            <label for="ep-postal">Поштовий код *</label>
+            <input id="ep-postal" name="postal_code" type="text" required>
+          </div>
+          <div style="flex:1" class="ep-input">
+            <label for="ep-dob">Дата народження *</label>
+            <input id="ep-dob" name="dob" type="date" required>
+          </div>
+        </div>
+        <div class="ep-row">
+          <div style="flex:1" class="ep-input">
+            <label for="ep-gender">Гендер *</label>
+            <select id="ep-gender" name="gender" required>
+              <option value="">— Оберіть —</option>
+              <option value="female">Жіноча</option>
+              <option value="male">Чоловіча</option>
+              <option value="other">Інше</option>
+              <option value="prefer_not">Не вказувати</option>
+            </select>
+          </div>
+          <div style="flex:1" class="ep-input">
+            <label for="ep-user-code">Код користувача (необов'язково)</label>
+            <input id="ep-user-code" name="user_code" type="text">
+          </div>
+        </div>
+        <div class="ep-note">Всі поля обов'язкові до заповнення, окрім коду користувача.</div>
+      </form>
+    </div>
+  </div>
+
+  {% schema %}
+{
+  "name": "event-product",
+  "tag": "section",
+  "settings": [],
+  "blocks": [
+    { "type": "image", "name": "Картинка (ліва)" },
+    { "type": "title", "name": "Заголовок" },
+    { "type": "description", "name": "Опис" },
+    { "type": "price", "name": "Ціна" },
+    { "type": "selectors", "name": "Селектори" },
+    { "type": "cta", "name": "Кнопка" }
+  ],
+  "max_blocks": 6,
+  "presets": [{ "name": "Event product section", "category": "Products" }]
+}
+  {% endschema %}
+</section>
