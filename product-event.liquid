@@ -1,3 +1,111 @@
+<style>
+  .ep-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px;
+    box-sizing: border-box;
+  }
+  .ep-grid {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+  }
+  .ep-left,
+  .ep-right {
+    box-sizing: border-box;
+  }
+  .ep-left {
+    flex: 1 1 50%;
+  }
+  .ep-right {
+    flex: 1 1 50%;
+  }
+  .ep-image {
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .ep-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .ep-title {
+    font-size: 24px;
+    margin: 0 0 8px;
+  }
+  .ep-description {
+    margin: 0 0 12px;
+    line-height: 1.4;
+  }
+  .ep-price {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 8px 0 12px;
+  }
+  .ep-selectors {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .ep-select {
+    display: flex;
+    flex-direction: column;
+  }
+  .ep-select label {
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  .ep-select select,
+  .ep-input input,
+  .ep-input select {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  .ep-cta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 12px;
+  }
+  .ep-button {
+    padding: 12px 18px;
+    border-radius: 8px;
+    background: #0a6;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .ep-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .ep-form {
+    margin-top: 16px;
+    display: grid;
+    gap: 8px;
+  }
+  .ep-form .ep-row {
+    display: flex;
+    gap: 8px;
+  }
+  .ep-form label {
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+  .ep-note {
+    font-size: 12px;
+    color: #666;
+    margin-top: 8px;
+  }
+  .ep-hidden {
+    display: none;
+  }
+</style>
+
 <section id="ep-event-product-section" class="ep-section" data-product-id="{{ product.id }}">
   <div class="ep-grid">
     <div class="ep-left">
