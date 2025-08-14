@@ -65,6 +65,7 @@
     border: 1px solid #ccc;
   }
   .ep-input {
+    flex: 1;
     display: flex;
     flex-direction: column;
   }
@@ -110,6 +111,23 @@
   }
   .ep-hidden {
     display: none;
+  }
+
+  @media (max-width: 768px) {
+    .ep-grid {
+      flex-direction: column;
+      gap: 16px;
+    }
+    .ep-left,
+    .ep-right {
+      width: 100%;
+    }
+    .ep-selectors {
+      grid-template-columns: 1fr;
+    }
+    .ep-form .ep-row {
+      flex-direction: column;
+    }
   }
 </style>
 
@@ -169,37 +187,43 @@
         {% elsif block.type == 'form' %}
           <form id="ep-personal-form" class="ep-form" novalidate>
             <div class="ep-row">
-              <div style="flex:1" class="ep-input">
+              <div class="ep-input">
                 <label for="ep-first-name">Ім'я *</label>
                 <input id="ep-first-name" name="first_name" type="text" required>
               </div>
-              <div style="flex:1" class="ep-input">
+
+              <div class="ep-input">
                 <label for="ep-last-name">Прізвище *</label>
                 <input id="ep-last-name" name="last_name" type="text" required>
               </div>
             </div>
+
             <div class="ep-row">
-              <div style="flex:1" class="ep-input">
+              <div class="ep-input">
                 <label for="ep-email">Email *</label>
                 <input id="ep-email" name="email" type="email" required>
               </div>
-              <div style="flex:1" class="ep-input">
+
+              <div class="ep-input">
                 <label for="ep-phone">Телефон *</label>
                 <input id="ep-phone" name="phone" type="tel" required>
               </div>
             </div>
+
             <div class="ep-row">
-              <div style="flex:1" class="ep-input">
+              <div class="ep-input">
                 <label for="ep-postal">Поштовий код *</label>
                 <input id="ep-postal" name="postal_code" type="text" required>
               </div>
-              <div style="flex:1" class="ep-input">
+
+              <div class="ep-input">
                 <label for="ep-dob">Дата народження *</label>
                 <input id="ep-dob" name="dob" type="date" required>
               </div>
             </div>
+
             <div class="ep-row">
-              <div style="flex:1" class="ep-input">
+              <div class="ep-input">
                 <label for="ep-gender">Гендер *</label>
                 <select id="ep-gender" name="gender" required>
                   <option value="">— Оберіть —</option>
@@ -209,7 +233,8 @@
                   <option value="prefer_not">Не вказувати</option>
                 </select>
               </div>
-              <div style="flex:1" class="ep-input">
+
+              <div class="ep-input">
                 <label for="ep-user-code">Код користувача (необов'язково)</label>
                 <input id="ep-user-code" name="user_code" type="text">
               </div>
@@ -222,9 +247,11 @@
   </div>
 
   <script>
+    // Дані варіантів продукту
     const variants = {{ product.variants | json }};
     const selects = document.querySelectorAll('.ep-option-select');
 
+    // Функція для оновлення доступності опцій
     function updateOptions() {
       const selectedValues = Array.from(selects).map(s => s.value);
 
@@ -232,15 +259,18 @@
         if (variant.available) {
           selects.forEach((select, index) => {
             Array.from(select.options).forEach(option => {
+
+              // Пропускаємо порожні або вже вибрані значення
               if (option.value === "" || option.value === selectedValues[index]) return;
 
               // Перевіряємо, чи існує варіант з поточними обраними значеннями
               const match = variants.some(v => {
                 return v.available &&
-                  v.options[index] === option.value &&
-                  selectedValues.every((val, i) => i === index || val === "" || v.options[i] === val);
+                       v.options[index] === option.value &&
+                       selectedValues.every((val, i) => i === index || val === "" || v.options[i] === val);
               });
 
+              // Блокуємо опцію, якщо підходящого варіанту немає
               option.disabled = !match;
             });
           });
@@ -248,22 +278,28 @@
       });
     }
 
+    // Слухаємо зміни вибору опцій
     selects.forEach(select => select.addEventListener('change', updateOptions));
+
+    // Початкове оновлення опцій
     updateOptions();
 
-          window.addEventListener('DOMContentLoaded', function(){
-            const product = {{ product | json }};
-            const priceEl = document.getElementById('ep-price');
-            const statusEl = document.getElementById('ep-variant-status');
-            const selects = Array.from(document.querySelectorAll('.ep-option-select'));
-            const addBtn = document.getElementById('ep-add-to-cart');
-            const form = document.getElementById('ep-personal-form');
+    // Основний код після завантаження DOM
+    window.addEventListener('DOMContentLoaded', function() {
+      const product = {{ product | json }};
+      const priceEl = document.getElementById('ep-price');
+      const statusEl = document.getElementById('ep-variant-status');
+      const selects = Array.from(document.querySelectorAll('.ep-option-select'));
+      const addBtn = document.getElementById('ep-add-to-cart');
+      const form = document.getElementById('ep-personal-form');
 
-            function findVariant(values){
-              return product.variants.find(v => v.options.every((opt,i) => opt === values[i]));
-            }
+      // Знайти варіант за вибраними значеннями
+      function findVariant(values) {
+        return product.variants.find(v => v.options.every((opt, i) => opt === values[i]));
+      }
 
-           function formatMoney(cents) {
+      // Форматування ціни у валюту магазину
+      function formatMoney(cents) {
         const amount = cents / 100;
         return amount.toLocaleString(undefined, {
           style: 'currency',
@@ -271,8 +307,11 @@
         });
       }
 
+      // Оновлення ціни та статусу варіанту
       function updatePriceAndStatus() {
         const values = selects.map(s => s.value || '');
+
+        // Якщо не всі опції вибрані
         if (values.some(v => v === '')) {
           const basePrice = formatMoney(product.price_min || product.price);
           priceEl.textContent = basePrice;
@@ -282,112 +321,155 @@
         }
 
         const variant = findVariant(values);
+
+        // Варіант недоступний
         if (!variant) {
           statusEl.textContent = 'Варіант недоступний.';
           addBtn.disabled = true;
           return;
         }
 
+        // Оновлюємо ціну та статус
         priceEl.textContent = formatMoney(variant.price);
         statusEl.textContent = variant.available ? 'В наявності' : 'Немає в наявності';
         addBtn.disabled = !variant.available;
         addBtn.dataset.variantId = variant.id;
       }
 
+      // Слухаємо зміни опцій для оновлення ціни та статусу
+      selects.forEach(s => s.addEventListener('change', updatePriceAndStatus));
 
-            selects.forEach(s=> s.addEventListener('change', updatePriceAndStatus));
+      // Індекси спеціальних опцій (код, дата, час)
+      const optionNames = product.options.map(o => o.toLowerCase());
+      const codeIndex = optionNames.findIndex(n => n.includes('код') || n.includes('code') || n.includes('type') || n.includes('код:'));
+      const dateIndex = optionNames.findIndex(n => n.includes('дата') || n.includes('date') || n.includes('day'));
+      const timeIndex = optionNames.findIndex(n => n.includes('час') || n.includes('time') || n.includes('hour'));
 
-            const optionNames = product.options.map(o => o.toLowerCase());
-            const codeIndex = optionNames.findIndex(n => n.includes('код') || n.includes('code') || n.includes('type')|| n.includes('код:'));
-            const dateIndex = optionNames.findIndex(n => n.includes('дата') || n.includes('date') || n.includes('day'));
-            const timeIndex = optionNames.findIndex(n => n.includes('час') || n.includes('time') || n.includes('hour'));
+      // Обмеження доступних дат і часу залежно від коду
+      function constrainDateTime() {
+        if (codeIndex < 0 || dateIndex < 0 || timeIndex < 0) return;
 
-            function constrainDateTime(){
-              if(codeIndex < 0 || dateIndex < 0 || timeIndex < 0) return;
-              const codeSelect = document.querySelector('#ep-option-' + codeIndex);
-              const dateSelect = document.querySelector('#ep-option-' + dateIndex);
-              const timeSelect = document.querySelector('#ep-option-' + timeIndex);
-              if(!codeSelect || !dateSelect || !timeSelect) return;
+        const codeSelect = document.querySelector('#ep-option-' + codeIndex);
+        const dateSelect = document.querySelector('#ep-option-' + dateIndex);
+        const timeSelect = document.querySelector('#ep-option-' + timeIndex);
+        if (!codeSelect || !dateSelect || !timeSelect) return;
 
-              const codeVal = codeSelect.value;
-              const groupKeywords = ['груп', 'групові', 'занят'];
-              const marathonKeywords = ['10', 'марафон', '10 км'];
-              function containsAny(str, arr){ if(!str) return false; str = str.toLowerCase(); return arr.some(k=>str.includes(k)); }
-              function filterOptions(selectEl, allowed){
-                const current = selectEl.value;
-                Array.from(selectEl.options).forEach(opt=>{
-                  if(opt.value === '' ) return;
-                  opt.disabled = !allowed.includes(opt.value);
-                });
-                if(current && !allowed.includes(current)) selectEl.value = '';
-              }
+        const codeVal = codeSelect.value;
 
-              if(containsAny(codeVal, groupKeywords)){
-                const allowedDates = Array.from(dateSelect.options).map(o=>o.value).filter(v => /31/.test(v) || v.includes('31'));
-                const allowedTimes = Array.from(timeSelect.options).map(o=>o.value).filter(v => /(9:00|9:30|10:00|10:30|11:00)/.test(v));
-                filterOptions(dateSelect, allowedDates);
-                filterOptions(timeSelect, allowedTimes);
-              } else if(containsAny(codeVal, marathonKeywords)){
-                const allowedDates = Array.from(dateSelect.options).map(o=>o.value).filter(v => /30/.test(v) || v.includes('30'));
-                const allowedTimes = Array.from(timeSelect.options).map(o=>o.value).filter(v => /(10:00|10:30|11:00|11:30|12:00|12:30)/.test(v));
-                filterOptions(dateSelect, allowedDates);
-                filterOptions(timeSelect, allowedTimes);
-              } else {
-                Array.from(dateSelect.options).forEach(o=> o.disabled = false);
-                Array.from(timeSelect.options).forEach(o=> o.disabled = false);
-              }
-            }
+        const groupKeywords = ['груп', 'групові', 'занят'];
+        const marathonKeywords = ['10', 'марафон', '10 км'];
 
-            if(codeIndex >=0){
-              const codeSel = document.querySelector('#ep-option-' + codeIndex);
-              if(codeSel) codeSel.addEventListener('change', function(){ constrainDateTime(); updatePriceAndStatus(); });
-            }
+        function containsAny(str, arr) {
+          if (!str) return false;
+          str = str.toLowerCase();
+          return arr.some(k => str.includes(k));
+        }
 
-            updatePriceAndStatus();
-
-            addBtn.addEventListener('click', function(){
-              const values = selects.map(s=>s.value || '');
-              if(values.some(v=>v==='')){ alert('Будь ласка, оберіть всі варіанти.'); return; }
-              const variantId = addBtn.dataset.variantId;
-              if(!variantId){ alert('Вибраний варіант недоступний.'); return; }
-              const required = Array.from(form.querySelectorAll('[required]'));
-              for(const el of required){ if(!el.value){ el.focus(); alert('Будь ласка заповніть всі обов\'язкові поля.'); return; } }
-              const props = {};
-              props['Ім\'я'] = document.getElementById('ep-first-name').value;
-              props['Прізвище'] = document.getElementById('ep-last-name').value;
-              props['Email'] = document.getElementById('ep-email').value;
-              props['Телефон'] = document.getElementById('ep-phone').value;
-              props['Поштовий код'] = document.getElementById('ep-postal').value;
-              props['Дата народження'] = document.getElementById('ep-dob').value;
-              props['Гендер'] = document.getElementById('ep-gender').value;
-              const userCodeVal = document.getElementById('ep-user-code').value;
-              if(userCodeVal) props['Код користувача'] = userCodeVal;
-              product.options.forEach((optName, idx)=>{
-                props['Вибір: ' + optName] = selects[idx] ? selects[idx].value : '';
-              });
-
-              const body = { id: variantId, quantity: 1, properties: props };
-              addBtn.disabled = true;
-              addBtn.textContent = 'Додаємо...';
-
-              fetch('/cart/add.js', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-              })
-              .then(r=> r.json())
-              .then(data=>{
-                window.location.href = '/checkout';
-              })
-              .catch(err=>{
-                console.error(err);
-                alert('Помилка при додаванні до кошика. Спробуйте ще раз.');
-                addBtn.disabled = false;
-                addBtn.textContent = 'Перейти до чекауту';
-              });
-            });
-
+        function filterOptions(selectEl, allowed) {
+          const current = selectEl.value;
+          Array.from(selectEl.options).forEach(opt => {
+            if (opt.value === '') return;
+            opt.disabled = !allowed.includes(opt.value);
           });
+          if (current && !allowed.includes(current)) selectEl.value = '';
+        }
+
+        // Обмеження для групових занять
+        if (containsAny(codeVal, groupKeywords)) {
+          const allowedDates = Array.from(dateSelect.options).map(o => o.value).filter(v => /31/.test(v));
+          const allowedTimes = Array.from(timeSelect.options).map(o => o.value).filter(v => /(9:00|9:30|10:00|10:30|11:00)/.test(v));
+          filterOptions(dateSelect, allowedDates);
+          filterOptions(timeSelect, allowedTimes);
+
+        // Обмеження для марафонів
+        } else if (containsAny(codeVal, marathonKeywords)) {
+          const allowedDates = Array.from(dateSelect.options).map(o => o.value).filter(v => /30/.test(v));
+          const allowedTimes = Array.from(timeSelect.options).map(o => o.value).filter(v => /(10:00|10:30|11:00|11:30|12:00|12:30)/.test(v));
+          filterOptions(dateSelect, allowedDates);
+          filterOptions(timeSelect, allowedTimes);
+
+        // Доступні всі варіанти
+        } else {
+          Array.from(dateSelect.options).forEach(o => o.disabled = false);
+          Array.from(timeSelect.options).forEach(o => o.disabled = false);
+        }
+      }
+
+      // Слухаємо зміну коду для обмеження дат/часу
+      if (codeIndex >= 0) {
+        const codeSel = document.querySelector('#ep-option-' + codeIndex);
+        if (codeSel) codeSel.addEventListener('change', function() {
+          constrainDateTime();
+          updatePriceAndStatus();
+        });
+      }
+
+      // Початкове оновлення ціни та статусу
+      updatePriceAndStatus();
+
+      // Кнопка додавання до кошика та перехід до чекауту
+      addBtn.addEventListener('click', function() {
+        const values = selects.map(s => s.value || '');
+        if (values.some(v => v === '')) {
+          alert('Будь ласка, оберіть всі варіанти.');
+          return;
+        }
+
+        const variantId = addBtn.dataset.variantId;
+        if (!variantId) {
+          alert('Вибраний варіант недоступний.');
+          return;
+        }
+
+        // Перевірка обов’язкових полів форми
+        const required = Array.from(form.querySelectorAll('[required]'));
+        for (const el of required) {
+          if (!el.value) {
+            el.focus();
+            alert('Будь ласка заповніть всі обов\'язкові поля.');
+            return;
+          }
+        }
+
+        // Формуємо властивості для замовлення
+        const props = {};
+        props['Ім\'я'] = document.getElementById('ep-first-name').value;
+        props['Прізвище'] = document.getElementById('ep-last-name').value;
+        props['Email'] = document.getElementById('ep-email').value;
+        props['Телефон'] = document.getElementById('ep-phone').value;
+        props['Поштовий код'] = document.getElementById('ep-postal').value;
+        props['Дата народження'] = document.getElementById('ep-dob').value;
+        props['Гендер'] = document.getElementById('ep-gender').value;
+        const userCodeVal = document.getElementById('ep-user-code').value;
+        if (userCodeVal) props['Код користувача'] = userCodeVal;
+
+        // Додаємо обрані опції продукту
+        product.options.forEach((optName, idx) => {
+          props['Вибір: ' + optName] = selects[idx] ? selects[idx].value : '';
+        });
+
+        const body = { id: variantId, quantity: 1, properties: props };
+        addBtn.disabled = true;
+        addBtn.textContent = 'Додаємо...';
+
+        // Відправка запиту на додавання у кошик
+        fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        })
+        .then(r => r.json())
+        .then(data => {
+          window.location.href = '/checkout';
+        })
+        .catch(err => {
+          console.error(err);
+          alert('Помилка при додаванні до кошика. Спробуйте ще раз.');
+          addBtn.disabled = false;
+          addBtn.textContent = 'Перейти до чекауту';
+        });
+      });
+    });
   </script>
 
   {% schema %}
